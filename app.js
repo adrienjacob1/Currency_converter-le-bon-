@@ -4,6 +4,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 // Routers
+const pairRouter = require("./routes/pair");
+const userRouter = require("./routes/user");
+const currencyRouter = require("./routes/currency");
 
 //MongoDBcredentials
 const credentials = { user: process.env.USER, pw: process.env.PW, db: process.env.DB};
