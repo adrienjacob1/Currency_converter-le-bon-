@@ -68,7 +68,6 @@ exports.createUser = (req, res) => {
 exports.logUser = (req, res) => {
     // récupérer pw et l'email envoyés par le front
     const validInput = new Validator(req.body, {
-        username: "required|string|length:50",
         email: "required|email|length:50",
         password: "required|string|length:16"  });
     
@@ -80,13 +79,13 @@ exports.logUser = (req, res) => {
                 res.status(400).send(validInput.errors);
             } else {
                  // vérifier si un compte correspondant ou pas
-                 User.findOne({ email: req.bodyemail })  // Voir doc open office. User.findOne() est une méthode do Mongoose (notre outil pour communiquer avec la base de donnée)
+                 User.findOne({ email: req.body.email })  // Voir doc open office. User.findOne() est une méthode do Mongoose (notre outil pour communiquer avec la base de donnée)
                  .then( user => {
                     if (!user) {
 
                         // Temppo pour limiter les attaques de force brute
-                        const tempo = resolve => setTimeout(resolve, 5000);
-                        Promise.all(tempo);
+                        //const tempo = resolve => setTimeout(resolve, 5000);
+                        //Promise.all(tempo);
                         return res.status(401).json({ error: "Username or password is invalid!" })
 
                     }
@@ -97,8 +96,8 @@ exports.logUser = (req, res) => {
                         if (!valid) {
 
                             // Temppo pour limiter les attaques de force brute
-                            const tempo = resolve => setTimeout(resolve, 5000);
-                            Promise.all(tempo);
+                            //const tempo = resolve => setTimeout(resolve, 5000);
+                            //Promise.all(tempo);
                             return res.status(401).json({ error: "Username or password is invalid!" }) // message anti-pirate (on ne précise pas si c'est le password ou le mail pour ne pas orienter le pirate)
     
                         }
@@ -114,10 +113,10 @@ exports.logUser = (req, res) => {
                                 },
                                 "SECRET_TOKEN_STRING",
                                 { 
-                                    expiresIn: "1h" 
+                                    expiresIn: "3h" 
                                 }
                                 )
-                            })
+                            });
 
                     })
                     .catch(() =>  res.status(500).json({ message: "Internal servor error with bcrypt"}));
@@ -178,7 +177,7 @@ exports.getOneUser = (req, res) => {
             .catch(() => res.status(500).json({ message: "Internal servor error with db" }));
         } else if (res.locals.userId === req.params.id) {
             User.findOne({ userId: reqParams.id })
-            .then(user => res.status(200).json(user))
+            .then(user => res.status(200).json(user)) // retourner l'objet user sans le password crypté
             .catch(() => res.status(500).json({ message: "Internal servor error with db" }))
         } else {
             res.status(401).json({ error : "Access denied!" })
@@ -212,7 +211,7 @@ exports.updateUser = (req, res) => {
                         return res.status(404).json({ error: "Didn't find user!" })
                     }
         
-                    if ( user.userId === req.locals.userId ) {
+                    if ( user.userId === res.locals.userId ) {
         
                         User.updateOne({ userId: reqParams.id }, {
                             email: req.body.email,
@@ -238,21 +237,21 @@ exports.updateUser = (req, res) => {
 
 
 exports.deleteUser = (req, res) => {
-    User.findOne({ userId: req.param.id })
+
+    User.findOne({ userId: req.params.id })
     .then(user => {
         if (!user) {
-            return res.status(404).json({ error: "Didn't find user!" });
+            return res.status(404).json({ error :"Didn't find user!"});
         }
 
-        if ( user.userId === req.locals.userId ) {
+        if ( user.userId == res.locals.userId ) {
 
-            User.deleteOne({ userId: reqParams.id })
-                .then(() => res.status(200).json({message: "User account updated!"}))
-                .catch(() => res.status(500).json({ message: "Internal servor error with db" }));
-            } else {
-                res.status(401).json({ error : "Access denied!" });
-            }
-            
-        })
-        .catch(() => res.status(500).json({ error: "Internal servor error with db" }))
+            User.deleteOne({ userId: req.params.id })
+            .then(() => res.status(200).json({ message: "User account deleted!" }))
+            .catch(() => res.status(500).json({ message: "Internal servor error with db"}));
+        } else {
+            res.status(401).json({ error : "Access denied!"});
+        }
+    })
+    .catch(() => res.status(500).json({ message: "Internal servor error with db"}));
 }
