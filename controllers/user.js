@@ -27,31 +27,33 @@ exports.createUser = (req, res) => {
             if (passwordSchema.validate(req.body.password)) {
                 // si le password correspond aux regles -> crypter le password avec bcypt
                 bcrypt.hash(req.body.password, 10)
-                .then(() => {
+                .then((hash) => {
 
-                // générer un nouvel id avec mongoose
-                const newId = new mongoose.Types.ObjectId();
+                    // générer un nouvel id avec mongoose
+                    const newId = new mongoose.Types.ObjectId();
 
-                // new User avec les valeurs du body
-                const user = new User( {
-                    userId: newId,
-                    username: req.body.username,
-                    email: req.body.email,
-                    password: hash,
-                    isAdmin: false
-                });
-                
-                // étape finale : user.save( { user } ) // sauvegardé dasn la db
-                user.save()
-                .then(() => req.status(201).json({ message: "User account created"}))
-                .catch(() => res.status(500).json({ error: "Internal servor error with database" }));
+                    // new User avec les valeurs du body
+                    const user = new User( {
+                        userId: newId,
+                        username: req.body.username,
+                        email: req.body.email,
+                        password: hash,
+                        isAdmin: false
+                    });
+                    
+                    // étape finale : user.save( { user } ) // sauvegardé dans la db
+                    user.save()
+                    .then(() => res.status(201).json({ message: "User account created"}))
+                    .catch(() => res.status(500).json({ error: "Internal servor error with database" }));
 
 
                 })
                 .catch(() => res.status(500).json({ error: "Internal servor error with bcrypt" }));
              
             } else {
-                throw "Invalid password";
+
+                res.status(400).json({ error: "Password dosen't meet the rules" });
+                
             }
 
 
@@ -59,7 +61,7 @@ exports.createUser = (req, res) => {
 
       
     })
-    .catch(() => res.status(500).send(valInput.errors));
+    .catch(() => res.status(500).send(validInput.errors));
    
 };
 
@@ -128,7 +130,7 @@ exports.logUser = (req, res) => {
     
           
         })
-        .catch(() => res.status(500).send(valInput.errors));
+        .catch(() => res.status(500).send(validInput.errors));
        
     };   
    
