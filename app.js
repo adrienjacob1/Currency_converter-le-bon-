@@ -4,9 +4,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 // Routers
-//const pairRouter = require("./routes/pair");
+const pairRouter = require("./routes/pair");
 const userRouter = require("./routes/user");
-//const currencyRouter = require("./routes/currency");
+const currencyRouter = require("./routes/currency");
 
 //MongoDBcredentials
 const credentials = { user: process.env.USER, pw: process.env.PW, db: process.env.DB};
@@ -28,8 +28,8 @@ app.use((req, res, next) => {
 });
 
 // Utiliser les routers
-//app.use("/pairs", pairRouter); // http://localhost:8081/pairs/.....
-//app.use("/currencies", currencyRouter); // http://localhost:8081/currencies/.....
+app.use("/pairs", pairRouter); // http://localhost:8081/pairs/.....
+app.use("/currencies", currencyRouter); // http://localhost:8081/currencies/.....
 app.use("/users", userRouter); // http://localhost:8081/users/.....
 
 module.exports = app;

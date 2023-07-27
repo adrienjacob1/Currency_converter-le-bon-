@@ -6,7 +6,7 @@ exports.createCurrency = (req, res) => {
 
     User.findOne({ userId: res.locals.userId })
     .then(user => {
-        if (user.isAdmin) {
+        if (user.userId == res.locals.userId) {
 
             const validInput = new Validator(req.body, {
                 code: 'required|string|length:50',
@@ -43,7 +43,7 @@ exports.updateCurrency = (req, res) => {
 
     User.findOne({ userId: res.locals.userId })
     .then(user => {
-        if (user.isAdmin) {
+        if (user.userId == res.locals.userId) {
 
             const validInput = new Validator(req.body, {
                 code: 'required|string|length:50',
@@ -80,7 +80,7 @@ exports.updateCurrency = (req, res) => {
 exports.deleteCurrency = (req, res) => {
     User.findOne({ userId: res.locals.userId })
     .then(user => {
-        if (user.isAdmin) {
+        if (user.userId == res.locals.userId) {
             Currency.findOne({ _id: req.params.id })
             .then(() => {
 

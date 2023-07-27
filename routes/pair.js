@@ -6,8 +6,9 @@ const router = express.Router();
 
 router.get("/", auth, pairCtrl.getAllPairs); // http://localhost:8081/pair/
 router.get("/:id", auth, pairCtrl.getOnePair);// http://localhost:8081/pair/id
-router.post("", userCtrl.createPair);// http://localhost:8081/pair/signup
-router.put("/increment", auth, pairCtrl.incrementPair); // http://localhost:8081/login
+router.post("/", auth, pairCtrl.createPair);
+router.put("/increment", pairCtrl.incrementPair); // On place la route d'incrémentation avant celle avec le param
+router.put("/:id", auth, pairCtrl.updatePair);
 router.delete("/:id", auth, pairCtrl.deletePair);
 
 
